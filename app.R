@@ -1,185 +1,162 @@
-# Load required libraries
-library(bs4Dash)
-library(leaflet)
-library(DT)
-library(plotly)
-library(readr)
-library(dplyr)
-library(tidyverse)
-library(readxl)
-library(tidygeocoder)
-library(sf)  
-library(mapview)
-library(mapdata)
-library(data.table)
 library(shiny)
-library(ggdist)
-library(ggthemes)
-library(ggplot2)
-library(rlang)
-library(PupillometryR)
-library(gridExtra)
-library(networkD3)
-library(tidyr)
-library(One4All)
-library(janitor)
-library(jsonlite)
-library(here)
-library(httr)
-
-devtools::install_github("jabiologo/rWind")
-library(rWind)
-library(raster)
-library(gdistance)
-
-w <- wind.dl(2024, 1, 1, 0, -125, -70, 25, 50)
-
-
-
-wind_layer <- wind2raster(w)
-
-Conductance<-flow.dispersion(wind_layer)
-
-AtoB<- shortestPath(Conductance, 
-                    c(-5.5, 37), c(-5.5, 35), output="SpatialLines")
-BtoA<- shortestPath(Conductance, 
-                    c(-5.5, 35), c(-5.5, 37), output="SpatialLines")
-
+library(bslib)  
+library(leaflet)  
+library(DT)  
+library(ggplot2)  
+library(rWind)  
+library(gdistance) 
+library(raster)  
+library(fields)  
 library(fields)
 library(shape)
 library(rworldmap)
 
-image.plot(wind_layer[["speed"]], main="Wind speed", 
-           col=terrain.colors(10), xlab="Longitude", ylab="Lattitude", zlim=c(0,7))
-
-lines(getMap(resolution = "low"), lwd=4)
-
-points(-5.5, 37, pch=19, cex=3.4, col="red")
-points(-5.5, 35, pch=19, cex=3.4, col="blue")
-
-lines(AtoB, col="red", lwd=4, lty=2)
-lines(BtoA, col="blue", lwd=4, lty=2)
-
-alpha <- arrowDir(w)
-Arrowhead(w$lon, w$lat, angle=alpha, arr.length = 0.4, arr.type="curved")
-
-text(-5.75, 37.25,labels="Spain", cex= 2.5, col="red", font=2)
-text(-5.25, 34.75,labels="Morocco", cex= 2.5, col="blue", font=2)
-legend("toprigh", legend = c("From Spain to Morocco", "From Morocco to Spain"),
-       lwd=4 ,lty = 1, col=c("red","blue"), cex=0.9, bg="white")
-library(terra)
-
-r <- rast(wind_layer)
-
-
-
-
-
-
-
-us_boundaries <- st_read(here("data/s_05mr24.shp"))
-
-
-# Convert sewage spills to spatial data frame
-sewage_spills_sf <- st_as_sf(sewage_spills, coords = c("longitude", "latitude"), crs = st_crs(watersheds))
-
-# Reproject datasets to WGS84
-sewage_spills_sf <- st_transform(sewage_spills_sf, crs = 4326)
-watersheds <- st_transform(watersheds, crs = 4326)
-
-# Perform spatial join to attribute sewage spills to watersheds
-sewage_spills_watershed <- st_join(sewage_spills_sf, watersheds)
-
-# Handle NA values by finding the nearest watershed
-na_spills <- sewage_spills_watershed[is.na(sewage_spills_watershed$wuname), ]
-non_na_spills <- sewage_spills_watershed[!is.na(sewage_spills_watershed$wuname), ]
-nearest_watershed <- sf::st_nearest_feature(na_spills, non_na_spills)
-
-# Replace NA values with the nearest watershed name
-sewage_spills_watershed$wuname[is.na(sewage_spills_watershed$wuname)] <- non_na_spills$wuname[nearest_watershed]
-# Convert sewage_spills_watershed to a non-spatial data frame
-sewage_spills_watershed_df <- as.data.frame(sewage_spills_watershed)
-sewage_spills_watershed_df <- sewage_spills_watershed_df %>%
-  select(-objectid, -wuc, -huc, -swma, -area_sqmi, -area_m2, -name_hwn, -st_areasha, -st_perimet, -objectid.1, -geoid20, -name20, -namelsad20, -aland20, -awater20, -pop20, -st_areasha.1, -st_perimet.1)
-
-sewage_spills_watershed_df <- sewage_spills_watershed_df %>%
-  left_join(watersheds, by = c("wuname", "island" = "name20"))
-
-
-# Convert back to a spatial data frame
-sewage_spills_watershed <- st_as_sf(sewage_spills_watershed_df)
-
-latitude <- sewage_spills$latitude
-longitude <- sewage_spills$longitude
-
-sewage_spills_watershed$latitude <- latitude
-sewage_spills_watershed$longitude <- longitude
-
-# Import dataset
-#sewage_spills_watershed <- st_read("sewage_spills_watershed.shp")
-
-################################################################################
-
-
-ui <- bs4DashPage(
-  bs4DashNavbar(
-    title = "Wind Farm Generator",
-    tags$style(
-      HTML(".navbar { background-color: #87CEEB; }")
-    )
+ui <- navbarPage(
+  title = "Wind Farm Generator",
+  theme = bs_theme(bootswatch = "cosmo"),
+  tabPanel("Home",
+           fluidPage(
+             fluidRow(
+               column(6,
+                      h3("About"),
+                      h5("By: Gerald Clark, Nicholas Leong, Ryan Stanley"),
+                      p("This tool helps users assess the best locations for wind farms using real-time wind data."),
+                      p("Users can customize wind turbine parameters and calculate expected MW output and costs.")),
+               column(6,
+                      img(src = "wind_farm.jpeg", height = "300px", width = "500px")) 
+             )
+           )
   ),
-  bs4DashSidebar(
-    tags$style(
-      HTML(".sidebar { background-color: #87CEEB; }")
-    ),
-    sidebarMenu(
-      menuItem("Interactive Map", tabName = "mapTab", icon = icon("map"))
-    )
+  tabPanel("Wind Data",
+           sidebarLayout(
+             sidebarPanel(
+               h4("Wind Data Inputs"),
+               numericInput("year", "Year:", 2024, min = 2000, max = 2030),
+               numericInput("month", "Month:", 1, min = 1, max = 12),
+               numericInput("day", "Day:", 1, min = 1, max = 31),
+               numericInput("hour", "Hour:", 0, min = 0, max = 23),
+               numericInput("lon_min", "Longitude Min:", -125),
+               numericInput("lon_max", "Longitude Max:", -70),
+               numericInput("lat_min", "Latitude Min:", 25),
+               numericInput("lat_max", "Latitude Max:", 50),
+               actionButton("load_data", "Load Wind Data")
+             ),
+             mainPanel(
+               h4("Wind Data Table"),
+               DTOutput("windTable"),
+               plotOutput("windPlot")
+             )
+           )
   ),
-  bs4DashBody(
-    fluidRow(
-      box(
-        title = "Wind Farm Map",
-        h3(
-          tags$div(
-            "Insert caption for this here",
-            style = "font-size: 14px;"
-          )
-        ),
-        width = 12
-      )
-    ),
-    fluidRow(
-      column(
-        width = 12,
-        plotOutput("windMap")
-      )
-    ),
-    fluidRow(
-      column(
-        width = 12,
-        box(
-          title = "Wind Data Table",
-          style = "overflow-x: auto;",
-          DT::dataTableOutput("windTable"),
-          width = 12
-        )
-      )
-    )
+  
+  tabPanel("Wind Farm Design",
+           sidebarLayout(
+             sidebarPanel(
+               h4("Wind Farm Customization"),
+               sliderInput("num_turbines", "Number of Turbines:", min = 1, max = 100, value = 10),
+               sliderInput("tower_height", "Tower Height (m):", min = 50, max = 150, value = 100),
+               sliderInput("blade_length", "Blade Length (m):", min = 10, max = 100, value = 50),
+               selectInput("material", "Blade Material:", choices = c("Fiberglass", "Carbon Fiber")),
+               actionButton("calculate", "Calculate MW Output")
+             ),
+             mainPanel(
+               h4("Wind Farm Performance"),
+               verbatimTextOutput("mw_output"),
+               verbatimTextOutput("cost_estimate")
+             )
+           )
+  ),
+  
+  tabPanel("Interactive Map",
+           fluidPage(
+             h4("Wind Profile Map"),
+             leafletOutput("windMap")
+           )
+  ),
+  
+  tabPanel("Export Report",
+           fluidPage(
+             h4("Generate Wind Farm Report"),
+             actionButton("export_report", "Download Report"),
+             p("Summary of the wind farm's expected MW output, costs, and selected location."),
+             downloadButton("download", "Download Report")
+           )
   )
 )
 
-
-
+# Define Server
 server <- function(input, output, session) {
-  output$windMap <- renderPlot({image.plot(wind_layer[["speed"]], main="Wind speed", 
-                                           col=terrain.colors(10), xlab="Longitude", ylab="Lattitude", zlim=c(0,7))
+  
+  # Load wind data when button is clicked
+  wind_data <- reactive({
+    req(input$load_data)  # Ensure button is clicked
+    isolate({
+      w <- wind.dl(input$year, input$month, input$day, input$hour, 
+                   input$lon_min, input$lon_max, input$lat_min, input$lat_max)
+      return(w)
+    })
+  })
+  
+  # Display wind data table
+  output$windTable <- DT::renderDataTable({
+    w <- wind_data()
+    req(w)
     
+    datatable(w, options = list(
+      scrollY = "400px",  # Enables vertical scrolling (adjust height as needed)
+      scrollX = TRUE,     # Enables horizontal scrolling to prevent overflow
+      autoWidth = TRUE,   # Adjusts column widths automatically
+      pageLength = 10     # Controls how many rows are shown per page
+    ))
+  })
+  # Plot wind speed
+  output$windPlot <- renderPlot({
+    w <- wind_data()
+    req(w)
+    
+    wind_layer <- wind2raster(w)
+    image.plot(wind_layer[["speed"]], main = "Wind Speed",
+               col = terrain.colors(10), xlab = "Longitude", ylab = "Latitude", zlim = c(0, 7))
     lines(getMap(resolution = "low"), lwd=4)
   })
   
-  output$windTable <- DT::renderDataTable({
-    w
+  # Leaflet Map for wind profile
+  output$windMap <- renderLeaflet({
+    leaflet() %>%
+      addTiles() %>%
+      setView(lng = -95, lat = 40, zoom = 4)
   })
+  
+  # Calculate MW output based on user input
+  output$mw_output <- renderText({
+    num_turbines <- input$num_turbines
+    tower_height <- input$tower_height
+    blade_length <- input$blade_length
+    
+    power_output <- num_turbines * blade_length * tower_height  # NEED TO INSERT REAL FORMULA
+    paste("Estimated Output: ", round(power_output, 2), " MW")
+  })
+  
+  # Cost estimate
+  output$cost_estimate <- renderText({
+    num_turbines <- input$num_turbines
+    material <- input$material
+    
+    cost_per_turbine <- ifelse(material == "Fiberglass", 1, 
+                               ifelse(material == "Carbon Fiber", 2.0)) * 1e6  
+    
+    total_cost <- num_turbines * cost_per_turbine
+    paste("Estimated Total Cost: $", format(round(total_cost, 2), big.mark = ","))
+  })
+  
+  # Export report button NOT FUNCTIONAL
+  output$download <- downloadHandler(
+    filename = function() { "wind_farm_report.pdf" },
+    content = function(file) {
+      writeLines("Wind Farm Report", file)
+    }
+  )
 }
+
+# Run the app
 shinyApp(ui, server)
