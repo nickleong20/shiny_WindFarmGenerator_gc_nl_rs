@@ -66,8 +66,9 @@ ui <- navbarPage(
              ),
              mainPanel(
                h4("Wind Farm Performance"),
-               verbatimTextOutput("mw_output"),
-               verbatimTextOutput("cost_estimate")
+               tableOutput("wind_farm_table")
+               #verbatimTextOutput("mw_output"),
+               #verbatimTextOutput("cost_estimate")
              )
            )
   ),
@@ -133,14 +134,24 @@ server <- function(input, output, session) {
   })
   
   # Calculate MW output based on user input
-  output$mw_output <- renderText({
+  output$wind_farm_table <- renderTable({
     num_turbines <- input$num_turbines
     tower_height <- input$tower_height
     blade_length <- input$blade_length
     
-    power_output <- num_turbines * blade_length * tower_height  # NEED TO INSERT REAL FORMULA
-    paste("Estimated Output: ", round(power_output, 2), " MW")
+    #REPLACE WITH A REAL FORMULA
+    power_output <- num_turbines * blade_length * tower_height  
+    
+    #REPLACE WITH A REAL FORMULA
+    cost_estimate <- num_turbines * 2.5 
+    
+    # Create the output table
+    data.frame(
+      "Metric" = c("Power Output (MW)", "Estimated Cost (Million $)"),
+      "Value" = c(round(power_output, 2), round(cost_estimate, 2))
+    )
   })
+  
   
   # Cost estimate
   output$cost_estimate <- renderText({
