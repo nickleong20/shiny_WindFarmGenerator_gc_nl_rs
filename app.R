@@ -21,7 +21,7 @@ ui <- navbarPage(
                       h3("About"),
                       h5("By: Gerald Clark, Nicholas Leong, Ryan Stanley"),
                       p("As nations worldwide accelerate their transition to renewable energy to meet carbon reduction goals, 
-                        the wind energy sector is experiencing unprecedented growth. In 2023 alone, 7.8% of the world's electricity was generated from wind turbine.
+                        the wind energy sector is experiencing unprecedented growth. In 2023 alone, 7.8% of the world's electricity was generated from wind turbines.
                         While shifts in administration may influence this progress, this powerful tool empowers users to identify optimal wind farm locations using 
                         real-time wind data from the National Oceanic and Atmospheric Administration (NOAA) Physical Sciences Laboratory. By leveraging cutting-edge technology,
                         users can evaluate the geographic and economic feasibility of future wind projects through an interactive map, wind farm design tools, 
