@@ -10,6 +10,7 @@ library(fields)
 library(fields)
 library(shape)
 library(rworldmap)
+library(shinycssloaders)
 
 ui <- navbarPage(
   title = "Wind Farm Generator",
@@ -47,8 +48,8 @@ ui <- navbarPage(
              ),
              mainPanel(
                h4("Wind Data Table"),
-               DTOutput("windTable"),
-               plotOutput("windPlot")
+               DTOutput("windTable") %>% withSpinner(color = "#0dc5c1"),
+               plotOutput("windPlot") %>% withSpinner(color = "#0dc5c1")
              )
            )
   ),
