@@ -7,9 +7,3 @@ This Shiny app provides an interactive and scrollable table for visualizing wind
 - Scrollable table with horizontal and vertical scrolling
 - Pagination for improved usability
 - Responsive design to prevent overflow
-
-### **Usage:**
-To run the app, execute the following in R:
-
-```r
-shiny::runApp("path_to_app")
