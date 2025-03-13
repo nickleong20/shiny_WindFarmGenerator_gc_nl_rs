@@ -40,11 +40,9 @@ ui <- navbarPage(
                leafletOutput("selectMap", height = "300px"),  
                h5("Selected Coordinates:"),
                verbatimTextOutput("selectedCoords"),
-               numericInput("year", "Year:", 2024, min = 2000, max = 2030),
-               numericInput("month", "Month:", 1, min = 1, max = 12),
-               numericInput("day", "Day:", 1, min = 1, max = 31),
-               numericInput("hour", "Hour:", 0, min = 0, max = 23),
-               actionButton("load_data", "Load Wind Data")
+               h5("Average Wind Speed (m/s):"),
+               verbatimTextOutput("avgWindSpeed"),
+               actionButton("load_data", "Load Climatology Wind Data")
              ),
              mainPanel(
                h4("Wind Data Table"),
@@ -110,17 +108,55 @@ server <- function(input, output, session) {
           "Latitude:", round(selected_location$lat, 2))
   })
   
+  output$avgWindSpeed <- renderText({
+    w <- wind_data()
+    req(w)
+    
+    avg_speed <- mean(w$avg_speed, na.rm = TRUE)
+    paste(round(avg_speed, 2), "m/s")  # Display rounded wind speed
+  })
+  
+  
   # Load wind data
   wind_data <- reactive({
     req(input$load_data, selected_location$lon, selected_location$lat)
     
     isolate({
-      w <- wind.dl(input$year, input$month, input$day, input$hour, 
-                   selected_location$lon - 1, selected_location$lon + 1, 
-                   selected_location$lat - 1, selected_location$lat + 1)
-      return(w)
+      # Define range of years for the climatology (Modify as needed)
+      years <- 2000:2020  
+      
+      # Fixed month, day, and hour for data retrieval (Can be adjusted)
+      month <- 6  
+      day <- 15  
+      hour <- 12  
+      
+      # Download wind data for each year
+      winds_list <- lapply(years, function(yr) {
+        tryCatch(
+          wind.dl(yr, month, day, hour, 
+                  selected_location$lon - 1, selected_location$lon + 1, 
+                  selected_location$lat - 1, selected_location$lat + 1),
+          error = function(e) { NULL }
+        )
+      })
+      
+      # Remove any years where data failed to download
+      winds_list <- Filter(Negate(is.null), winds_list)
+      
+      if(length(winds_list) == 0){
+        return(NULL)
+      }
+      
+      # Combine data frames (assuming each dataset has a column named "speed")
+      combined <- do.call(rbind, winds_list)
+      
+      # Compute the average wind speed for the entire dataset
+      combined$avg_speed <- mean(combined$speed, na.rm = TRUE)
+      
+      return(combined)  
     })
   })
+  
   
   output$windTable <- DT::renderDataTable({
     w <- wind_data()
@@ -133,9 +169,11 @@ server <- function(input, output, session) {
     w <- wind_data()
     req(w)
     
+    # Convert averaged wind data to a raster format
     wind_layer <- wind2raster(w)
-    image.plot(wind_layer[["speed"]], main = "Wind Speed", col = terrain.colors(10), xlab = "Longitude", ylab = "Latitude", zlim = c(0, 7))
-    lines(getMap(resolution = "low"), lwd=4)
+    image.plot(wind_layer[["speed"]], main = "Climatological Average Wind Speed", 
+               col = terrain.colors(10), xlab = "Longitude", ylab = "Latitude", zlim = c(0, max(w$speed, na.rm=TRUE)))
+    lines(getMap(resolution = "low"), lwd = 4)
   })
   
   # Wind farm calculations
@@ -153,7 +191,7 @@ server <- function(input, output, session) {
     w <- wind_data()
     req(w)
     
-    avg_wind_speed_80m <- mean(w$speed, na.rm = TRUE)
+    avg_wind_speed_80m <- mean(w$avg_speed, na.rm = TRUE)
     avg_wind_speed_H <- avg_wind_speed_80m * (tower_height / H0) ^ wind_shear_exponent
     
     if (material == "Fiberglass") {
