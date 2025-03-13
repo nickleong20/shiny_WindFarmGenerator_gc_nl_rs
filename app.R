@@ -12,7 +12,8 @@ library(shinycssloaders)
 library(rmarkdown)
 library(tidyverse)
 library(beepr)
-tinytex::install_tinytex()
+library(tinytex)
+
 
 ui <- navbarPage(
   title = "Wind Farm Generator",
@@ -83,7 +84,6 @@ ui <- navbarPage(
   tabPanel("Export Report",
            fluidPage(
              h4("Generate Wind Farm Report"),
-             actionButton("export_report", "Download Report"),
              downloadButton("download", "Download Report")
            )
   )
