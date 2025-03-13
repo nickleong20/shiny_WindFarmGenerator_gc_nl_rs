@@ -162,6 +162,7 @@ server <- function(input, output, session) {
       # Compute the average wind speed for the entire dataset
       combined$avg_speed <- mean(combined$speed, na.rm = TRUE)
       
+      beep(4)
       return(combined)  
     })
   })
@@ -253,6 +254,8 @@ server <- function(input, output, session) {
   
   observeEvent(input$calculate, {
     req(wind_farm_results$total_power, wind_farm_results$total_cost)
+    
+    beep(2)
     
     showModal(modalDialog(
       title = "Wind Farm Calculation Results",
