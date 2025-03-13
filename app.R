@@ -27,7 +27,7 @@ ui <- navbarPage(
                         empowers users to identify optimal wind farm locations using real-time wind data from the 
                         National Oceanic and Atmospheric Administration (NOAA) Physical Sciences Laboratory. By leveraging cutting-edge technology,
                         users can evaluate the geographic and economic feasibility of future wind projects through an interactive map, wind farm design tools, 
-                        expected megawatt output calculator, total cost, and increased data access, paving the way for a cleaner, more sustainable energy future.")),,
+                        expected megawatt output calculator, total cost, and increased data access, paving the way for a cleaner, more sustainable energy future.")),
                column(6, img(src = "Wind_farm_highres.jpeg", height = "300px", width = "500px")) 
              )
            )
