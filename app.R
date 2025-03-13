@@ -11,6 +11,8 @@ library(rworldmap)
 library(shinycssloaders)
 library(rmarkdown)
 library(tidyverse)
+library(beepr)
+tinytex::install_tinytex()
 
 ui <- navbarPage(
   title = "Wind Farm Generator",
