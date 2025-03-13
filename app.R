@@ -32,8 +32,8 @@ ui <- navbarPage(
                         the National Oceanic and Atmospheric Administration (NOAA) Physical Sciences Laboratory.
                         The Wind Data tab allows users to select a location anywhere in the world. The generated output will consist of the 
                         average eastward wind velocity at 10m (U component), the northward wind velocity at 10m (V component), the direction of the wind,
-                        and the wind speed. The averages were generated from data collected daily at noon from the year 2000 onward. The Wind Farm Design tab 
-                        allows users to customize a wind farm with the following parameters: number of turbines, tower height (m), blade length, and blade material.
+                        and the wind speed. The averages were generated from data collected daily at noon from the year 2000 onward. Additionally, a wind parcel raster is outputed to
+                        visualize a spatial analysis on the inputted data from rWind. The Wind Farm Design tab allows users to customize a wind farm with the following parameters: number of turbines, tower height (m), blade length, and blade material.
                         The power output (Megawatts) is generated from the wind power equation utilized by the U.S. Department of Energy. The estimated cost output (millions $USD)
                         is calculated by applying scaling costs based on turbine count, material choice, and blade size. The Export Report tab generates a PDF report with the parameters
                         selected from the Wind Farm Design tab. Additionally, it includes the estimated power output and estimated cost of the wind farm. By leveraging cutting-edge technology,
