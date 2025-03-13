@@ -36,7 +36,8 @@ ui <- navbarPage(
                         selected from the Wind Farm Design tab. Additionally, it includes the estimated power output and estimated cost of the wind farm. By leveraging cutting-edge technology,
                         users can evaluate the geographic and economic feasibility of future wind projects through an interactive map, wind farm design tools, expected megawatt output calculator,
                         total cost, and increased data access, paving the way for a cleaner, more sustainable energy future.")),
-               column(6, img(src = "Wind_farm_highres.jpeg", height = "300px", width = "500px")) 
+               column(6, img(src = "Wind_farm_highres.jpeg", height = "360px", width = "585px"),
+                      img(src="cloud.jpg", height = "360px", width = "585px")) 
              )
            )
   ),
