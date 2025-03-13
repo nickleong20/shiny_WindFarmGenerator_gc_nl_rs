@@ -22,13 +22,20 @@ ui <- navbarPage(
                column(6,
                       h3("About"),
                       h5("By: Gerald Clark, Nicholas Leong, Ryan Stanley"),
-                      p("As nations worldwide accelerate their transition to renewable energy to meet carbon reduction goals, 
-                        the wind energy sector is experiencing unprecedented growth. In 2023 alone, 7.8% of the world's electricity 
-                        was generated from wind turbines. While shifts in administration may influence this progress, this powerful tool 
-                        empowers users to identify optimal wind farm locations using real-time wind data from the 
-                        National Oceanic and Atmospheric Administration (NOAA) Physical Sciences Laboratory. By leveraging cutting-edge technology,
-                        users can evaluate the geographic and economic feasibility of future wind projects through an interactive map, wind farm design tools, 
-                        expected megawatt output calculator, total cost, and increased data access, paving the way for a cleaner, more sustainable energy future.")),
+                      p("As nations worldwide accelerate their transition to renewable energy to meet carbon reduction goals,
+                        the wind energy sector is experiencing unprecedented growth. In 2023 alone, 7.8% of the world's electricity
+                        was generated from wind turbines. While shifts in administration may influence this progress, this powerful tool
+                        empowers users to identify optimal wind farm locations using real-time wind data from
+                        the National Oceanic and Atmospheric Administration (NOAA) Physical Sciences Laboratory.
+                        The Wind Data tab allows users to select a location anywhere in the world. The generated output will consist of the 
+                        average eastward wind velocity at 10m (U component), the northward wind velocity at 10m (V component), the direction of the wind,
+                        and the wind speed. The averages were generated from data collected daily at noon from the year 2000 onward. The Wind Farm Design tab 
+                        allows users to customize a wind farm with the following parameters: number of turbines, tower height (m), blade length, and blade material.
+                        The power output (Megawatts) is generated from the wind power equation utilized by the U.S. Department of Energy. The estimated cost output (millions $USD)
+                        is calculated by applying scaling costs based on turbine count, material choice, and blade size. The Export Report tab generates a PDF report with the parameters
+                        selected from the Wind Farm Design tab. Additionally, it includes the estimated power output and estimated cost of the wind farm. By leveraging cutting-edge technology,
+                        users can evaluate the geographic and economic feasibility of future wind projects through an interactive map, wind farm design tools, expected megawatt output calculator,
+                        total cost, and increased data access, paving the way for a cleaner, more sustainable energy future.")),
                column(6, img(src = "Wind_farm_highres.jpeg", height = "300px", width = "500px")) 
              )
            )
