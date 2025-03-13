@@ -303,23 +303,23 @@ server <- function(input, output, session) {
       tempReport <- tempfile(fileext = ".Rmd")
       
       report_content <- "
-      ---
-      title: '`r params$title`'
+       ---
+      title: `r params$title`
       output: pdf_document
       ---
 
-      ![Wind Farm]( `r params$image_path` )
+      [Wind Farm]
 
       ## Wind Farm Details
-      - **Location:** `r params$location`
-      - **Number of Turbines:** `r params$num_turbines`
-      - **Tower Height:** `r params$tower_height` m
-      - **Blade Length:** `r params$blade_length` m
-      - **Blade Material:** `r params$material`
+      - Location: `r params$location`
+      - Number of Turbines: `r params$num_turbines`
+      - Tower Height: `r params$tower_height` m
+      - Blade Length: `r params$blade_length` m
+      - Blade Material: `r params$material`
 
       ## Performance & Cost Analysis
-      - **Estimated Power Output:** `r params$power_output` MW
-      - **Estimated Cost:** `r params$estimated_cost`
+      - Estimated Power Output: `r params$power_output` MW
+      - Estimated Cost: `r params$estimated_cost`
       "
       
       writeLines(report_content, tempReport)
