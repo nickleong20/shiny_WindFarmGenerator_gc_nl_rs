@@ -21,8 +21,13 @@ ui <- navbarPage(
                column(6,
                       h3("About"),
                       h5("By: Gerald Clark, Nicholas Leong, Ryan Stanley"),
-                      p("This tool helps users find optimal wind farm locations using real-time NOAA wind data. 
-                        It provides an interactive map, wind farm design tools, power output calculations, and cost estimation.")),
+                      p("As nations worldwide accelerate their transition to renewable energy to meet carbon reduction goals, 
+                        the wind energy sector is experiencing unprecedented growth. In 2023 alone, 7.8% of the world's electricity 
+                        was generated from wind turbines. While shifts in administration may influence this progress, this powerful tool 
+                        empowers users to identify optimal wind farm locations using real-time wind data from the 
+                        National Oceanic and Atmospheric Administration (NOAA) Physical Sciences Laboratory. By leveraging cutting-edge technology,
+                        users can evaluate the geographic and economic feasibility of future wind projects through an interactive map, wind farm design tools, 
+                        expected megawatt output calculator, total cost, and increased data access, paving the way for a cleaner, more sustainable energy future.")),,
                column(6, img(src = "Wind_farm_highres.jpeg", height = "300px", width = "500px")) 
              )
            )
