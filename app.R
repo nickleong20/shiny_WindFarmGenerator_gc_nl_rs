@@ -10,6 +10,7 @@ library(fields)
 library(rworldmap)
 library(shinycssloaders)
 library(rmarkdown)
+library(tidyverse)
 
 ui <- navbarPage(
   title = "Wind Farm Generator",
@@ -159,7 +160,18 @@ server <- function(input, output, session) {
   
   
   output$windTable <- DT::renderDataTable({
-    w <- wind_data()
+    w <- wind_data() %>%
+      rename(Time = time,
+             Latitude = lat, 
+             Longitude = lon, 
+             `Wind Speed (m/s)` = speed,
+             `Wind Direction (º)` = dir,
+             `U Component of Wind (m/s)` = ugrd10m,
+             `V Component of Wind (m/s)` = vgrd10m,
+             `Average Speed (m/s)` = avg_speed) %>%
+      mutate(across(c(`Wind Speed (m/s)`, `Wind Direction (º)`, 
+                      `U Component of Wind (m/s)`, `V Component of Wind (m/s)`, `Average Speed (m/s)`), 
+                    \(x) round(x, 2)))
     req(w)
     
     datatable(w, options = list(scrollY = "400px", scrollX = TRUE, autoWidth = TRUE, pageLength = 10))
