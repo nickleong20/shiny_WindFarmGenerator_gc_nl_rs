@@ -268,19 +268,24 @@ server <- function(input, output, session) {
       br(),
       div(
         style = "font-size: 20px; font-weight: bold; color: #28a745; text-align: center;",
-        paste("Estimated Cost:", wind_farm_results$total_cost)
+        paste("Estimated Cost:", wind_farm_results$total_cost, "Million")
       ),
       easyClose = TRUE,
       footer = modalButton("Close")
     ))
   })
 
+  observeEvent(input$download, {
+    beep(3)  # Play a beep sound when download starts
+  })
   
   # Generate PDF Report
   output$download <- downloadHandler(
     filename = function() { "wind_farm_report.pdf" },
     content = function(file) {
       req(wind_farm_results$total_power, wind_farm_results$total_cost)
+      
+      beep(3)
       
       params <- list(
         title = "Wind Farm Report",
